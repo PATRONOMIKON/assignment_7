@@ -1,78 +1,35 @@
-# Assignment 6: Making the Impossible Possible
+# Assignment 6 — Longest Common Subsequence (LCS)
 
-## Setup Instructions
+This project implements and compares three algorithms that return the **length** of the longest common subsequence shared by two strings. The included datasets are DNA strings using `A`, `C`, `G`, and `T`.
 
-### 1. Clone this repository and open in VS Code
+## Files
+
+- `lcs_solver.py` — naive recursion, top-down memoization, and bottom-up tabulation.
+- `sequence_generator.py` — generates reproducible pairs of sizes 10, 20, 50, 100, 200, 500, and 1000.
+- `sequences/` — generated JSON input datasets.
+- `test_lcs.py` — correctness tests, including the assignment example.
+- `benchmark.py` — times the algorithms and writes `benchmark_results.csv`.
+- `benchmark_results.csv` — measured timings from the included datasets (timings vary by machine).
+- `LCS_Analysis.docx` — written analysis submitted with the project.
+
+## Run
+
+Use Python 3.9 or newer. No third-party packages are required.
 
 ```bash
-git clone <REPO_URL>
-cd dp-assignment
-code .
-```
-
-### 2. Generate the DNA sequences
-
-Run the sequence generator to create test cases of varying sizes:
-
-```bash
+python -m unittest -v
 python sequence_generator.py
-# You may need to run python3 sequence_generator.py
+python benchmark.py
 ```
 
-This will create:
-- `sequences/dna_10.json` - 10 base pair sequences
-- `sequences/dna_20.json` - 20 base pair sequences
-- `sequences/dna_50.json` - 50 base pair sequences
-- `sequences/dna_100.json` - 100 base pair sequences
-- `sequences/dna_200.json` - 200 base pair sequences
-- `sequences/dna_500.json` - 500 base pair sequences
-- `sequences/dna_1000.json` - 1000 base pair sequences
-
-### 3. Implement your LCS algorithms
-
-Open `starter_code.py` and complete the three functions:
-1. `lcs_recursive()` - Naive recursive solution (will be slow)
-2. `lcs_memoization()` - Top-down dynamic programming with caching
-3. `lcs_tabulation()` - Bottom-up dynamic programming with table
-
-### 4. Test and compare
-
-Uncomment the test functions in the `__main__` block:
-
-```python
-if __name__ == "__main__":
-    test_small_cases()          # Verify correctness on small inputs
-    time_recursive()            # See how slow recursive becomes
-    compare_all_approaches()    # Compare all three on large inputs
-```
-
-Then run:
+The generator defaults to seed `2026`, so the same input strings are generated on each run. To use another seed:
 
 ```bash
-python starter_code.py
-# or python3 starter_code.py
+python sequence_generator.py --seed 123
 ```
 
-## The Problem: Longest Common Subsequence (LCS)
+The naive recursive implementation is intentionally exponential and is benchmarked only for sizes up to 20. The benchmark has a 10-second guard for recursive runs on Unix-like systems. Memoization and tabulation are run for all supplied sizes. Tabulation stores only two rows, using `O(min(n, m))` auxiliary space.
 
-Given two DNA sequences, find the length of their longest common subsequence.
+## Algorithm summary
 
-A **subsequence** is a sequence that appears in the same relative order but not necessarily contiguous.
-
-**Example:**
-- Sequence 1: `AGGTAB`
-- Sequence 2: `GXTXAYB`
-- LCS: `GTAB` (length 4)
-
-The characters G, T, A, B appear in both sequences in that order (though not consecutively). The DNA sequences that you will analyze in this assignment will be composed of strings that have a combination of the letters G, C, T, and A (the four bases found in DNA stands).
-
-## What to Submit
-
-Submit two items:
-1. **GitHub repository link** containing your completed code
-2. **Written analysis document** (Google Doc or Word) containing:
-   - Recursive Analysis section (100-150 words)
-   - Dynamic Programming Comparison section (200-250 words)
-   - Total: 300-400 words
-
-Good luck! Remember: the key skill is recognizing when and how to optimize.
+For prefixes ending at positions `i` and `j`, an empty prefix has LCS length 0. If the final characters match, add one to the LCS of the two shorter prefixes. Otherwise, take the maximum after removing one final character from either sequence. Memoization caches each index pair; tabulation computes the same recurrence iteratively.
